@@ -46,7 +46,7 @@ nav a.item{color:var(--ink-soft);font-size:15px}
 nav a.item:hover{color:var(--accent);text-decoration:none}
 
 /* hero（用 header.wrap 提权重：.wrap{padding:0 24px} 会把元素选择器的上下 padding 清零） */
-header.wrap{padding:116px 0 66px;text-align:center}
+header.wrap{padding:64px 0 66px;text-align:center}
 .hero-logo{width:112px;height:112px;border-radius:26px;margin:0 auto 30px;display:block;
   box-shadow:0 14px 34px rgba(120,70,25,.28), inset 0 2px 6px rgba(255,255,255,.25)}
 h1{font-size:54px;letter-spacing:6px;line-height:1.25}
@@ -110,6 +110,8 @@ h1 small{display:block;font-size:19px;color:var(--ink-soft);letter-spacing:6px;m
   .rail .phone:nth-child(2){z-index:3;transform:none}
   .rail .phone:nth-child(3){z-index:2;transform:none}
   .rail .phone:nth-child(4){z-index:1;transform:none}
+  /* 滑动中离视口中心最近的卡片抬到顶层（.rail .phone.active 由脚本切换） */
+  .rail .phone.active{z-index:9;box-shadow:0 14px 34px rgba(80,60,30,.24)}
   .rail-hint{display:block}
 }
 
@@ -220,6 +222,36 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <script>
 'use strict';
+// 窄屏截图横滑：滑动时把离视口中心最近的卡片抬到顶层（配合 .phone.active），
+// 让当前查看的截图完整露出，其余的压在下面。桌面端无横滚，事件不触发。
+(() => {
+  const rail = document.querySelector('.rail');
+  if (!rail) return;
+  const first = rail.querySelector('.phone');
+  if (first) first.classList.add('active');
+  let raf = 0;
+  rail.addEventListener('scroll', () => {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const railRect = rail.getBoundingClientRect();
+      const center = railRect.left + railRect.width / 2;
+      let best = null, bestD = Infinity;
+      rail.querySelectorAll('.phone').forEach((p) => {
+        const r = p.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - center);
+        if (d < bestD) { bestD = d; best = p; }
+      });
+      rail.querySelectorAll('.phone.active').forEach((p) => {
+        if (p !== best) p.classList.remove('active');
+      });
+      if (best) best.classList.add('active');
+    });
+  }, {passive: true});
+})();
+</script>
+
+<script>
 // 下载链路：拉 latest release 回填版本号 / APK 直链 / 体积，并给 GitHub
 // 直链与 ghproxy 系镜像竞速，谁先返回响应头谁当默认下载按钮。任何失败
 // 都保持 releases/latest 兜底链接（不拼文件名，tag 内嵌版本易漂移）。
