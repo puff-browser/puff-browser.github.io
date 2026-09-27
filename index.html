@@ -45,8 +45,8 @@ nav .wrap{display:flex;align-items:center;gap:26px;height:60px}
 nav a.item{color:var(--ink-soft);font-size:15px}
 nav a.item:hover{color:var(--accent);text-decoration:none}
 
-/* hero */
-header{padding:88px 0 66px;text-align:center}
+/* hero（用 header.wrap 提权重：.wrap{padding:0 24px} 会把元素选择器的上下 padding 清零） */
+header.wrap{padding:116px 0 66px;text-align:center}
 .hero-logo{width:112px;height:112px;border-radius:26px;margin:0 auto 30px;display:block;
   box-shadow:0 14px 34px rgba(120,70,25,.28), inset 0 2px 6px rgba(255,255,255,.25)}
 h1{font-size:54px;letter-spacing:6px;line-height:1.25}
@@ -87,6 +87,31 @@ h1 small{display:block;font-size:19px;color:var(--ink-soft);letter-spacing:6px;m
 .rail .phone:nth-child(2){transform:rotate(1.4deg)}
 .rail .phone:nth-child(3){transform:rotate(-1.2deg) translateY(6px)}
 .rail .phone:nth-child(4){transform:rotate(2deg) translateY(14px)}
+
+/* 横屏展示 */
+.landscape{margin-top:56px}
+.ls-head{display:flex;align-items:baseline;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.ls-head b{font-size:21px;letter-spacing:2px}
+.ls-head span{color:var(--ink-soft);font-size:15px;letter-spacing:.5px}
+.ls-head span em{font-style:normal;color:var(--accent);font-weight:600}
+.phone.wide{width:min(760px,100%);margin:0 auto}
+.rail-hint{display:none;text-align:center;color:var(--ink-soft);font-size:13px;letter-spacing:3px;margin-top:8px}
+
+/* 窄屏：截图横向滑动排开、相互叠压，滑动查看（在 rotate 规则之后以覆盖 transform） */
+@media (max-width:760px){
+  .rail{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;
+    scroll-snap-type:x proximity;gap:0;padding:16px 44px 26px;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .rail .phone{flex:none;width:64vw;scroll-snap-align:center;margin-left:-40px;
+    box-shadow:0 8px 24px rgba(80,60,30,.16)}
+  .rail .phone:first-child{margin-left:0}
+  /* 与外层 :nth-child rotate 同权重、源顺序在后，压掉旋转 */
+  .rail .phone:nth-child(1){z-index:4;transform:none}
+  .rail .phone:nth-child(2){z-index:3;transform:none}
+  .rail .phone:nth-child(3){z-index:2;transform:none}
+  .rail .phone:nth-child(4){z-index:1;transform:none}
+  .rail-hint{display:block}
+}
 
 /* sections */
 section{padding:74px 0;border-top:1px solid var(--line)}
@@ -146,7 +171,18 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <div class="phone"><img src="assets/phone-2-menu.png" alt="浏览器菜单：桌面模式、代理快切、书签"></div>
   <div class="phone"><img src="assets/phone-3-settings.png" alt="设置页：搜索设置、常规、显示"></div>
   <div class="phone"><img src="assets/phone-4-proxy.png" alt="规则代理：多出口与自动切换"></div>
-</div></div>
+</div>
+<p class="rail-hint">← 横滑查看截图 →</p>
+<div class="landscape">
+  <div class="ls-head">
+    <b>横屏，小屏的正确打开方式</b>
+    <span><em>工具栏侧置</em> · <em>地址栏默认收起</em> · <em>高度全给网页</em></span>
+  </div>
+  <div class="phone wide">
+    <img src="assets/phone-landscape.png" alt="横屏：工具栏侧置右手边，隐藏状态栏全屏浏览">
+  </div>
+</div>
+</div>
 
 <section id="features"><div class="wrap">
   <div class="kicker">FEATURES</div>
